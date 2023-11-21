@@ -16,20 +16,23 @@ from pmath import pair_wise_eud, pair_wise_cos, pair_wise_hyp
 from utils import get_son2parent
 from dataset import get_cifar_data, get_imagenet_data, get_mim_data
 
-def Binarize(n_bits, Xte):
-    feat_max, feat_min = torch.max(Xte), torch.min(Xte)
-    minimum_scale = (feat_max - feat_min) / (2 ** n_bits - 1)
+def binarize(X, n_bits = 2):
 
-    Xte_uint8 = torch.floor((Xte - feat_min) / minimum_scale).to(torch.uint8)
+    feat_max, feat_min = torch.max(X), torch.min(X)
 
-    Xte_8bits = np.unpackbits(Xte_uint8[:, None, :], axis=1)
+    minimum_scale = (feat_max - feat_min) / (2 ** n_bits)
+    X_uint8 = torch.floor((X - feat_min) / minimum_scale).to(torch.uint8)
 
-    Xte_nbits = Xte_8bits[:, 8-n_bits:,:]
+    nBytes = X.shape[1] // 8 * n_bits
 
-    Xte_binary = Xte_nbits.reshape(-1, n_bits*Xte.shape[1])
+    B = torch.zeros(X.shape[0], nBytes, dtype=torch.uint8)
 
-    Bte = torch.from_numpy(Xte_binary).to(torch.bool)
-    return Bte
+    n_groups = 8 // n_bits # each Byte is divided to n_groups
+
+    for i in range(n_groups):
+        B += X_uint8[:, i*nBytes:(i+1)*nBytes] << i * n_bits
+
+    return B
 
 
 def loss_fn(y, Apred, dist_func, c, T):

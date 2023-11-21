@@ -29,4 +29,3 @@ Bte = (Xte_uint8[:nBytes] << 4) + Xte_uint8[nBytes:2*nBytes]
 
 import pdb
 pdb.set_trace()
-
