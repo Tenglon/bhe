@@ -48,10 +48,10 @@ parser.add_argument('--dataset', type=str, choices=['cifar100', 'imagenet', 'mim
 args = parser.parse_args()
 
 if args.dataset == "cifar100":
-    Xtr,Xte,ytr,yte,hierarchy_csv,label_set = get_cifar_data()
+    Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_cifar_data()
     
 elif args.dataset == "imagenet":
-    Xtr,Xte,ytr,yte,hierarchy_csv,label_set = get_imagenet_data()
+    Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_imagenet_data()
 
 elif args.dataset == "mim":
     Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_mim_data()
@@ -77,7 +77,7 @@ class MLP(nn.Module):
     def forward(self, x):
         x = self.relu(self.fc1(x))
         x = self.bn1(x)
-        x = x / x.norm(dim = 1).view(-1, 1) # re-normalize
+        # x = x / x.norm(dim = 1).view(-1, 1) # re-normalize
         x = self.softmax(self.fc2(x))
 
         return x
@@ -96,7 +96,7 @@ def get_topK_preds(X, y, top_K):
 model = MLP(Xtr.shape[1], ytr.unique().nelement())
 model = model.cuda()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
 metric = Metric(label_set, son2parent)
 
 for epoch in range(100):
