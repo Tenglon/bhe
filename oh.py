@@ -15,14 +15,6 @@ from utils import get_son2parent
 from dataset import get_cifar_data, get_imagenet_data, get_mim_data
 
 
-def loss_fn(support, query, dist_func, c, T):
-    #Here we use synthesised support.
-    logits = -dist_func(support,query,c) / T
-    fewshot_label = torch.arange(support.size(0)).cuda()
-    loss = F.cross_entropy(logits, fewshot_label)
-    
-    return loss
-
 # create dataset and dataloader
 class FeatureDataset(Dataset):
     def __init__(self, X, y):
@@ -48,13 +40,13 @@ parser.add_argument('--dataset', type=str, choices=['cifar100', 'imagenet', 'mim
 args = parser.parse_args()
 
 if args.dataset == "cifar100":
-    Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_cifar_data()
+    Xtr, Xte, ytr, yte, hierarchy_csv, label_set, _ = get_cifar_data()
     
 elif args.dataset == "imagenet":
-    Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_imagenet_data()
+    Xtr, Xte, ytr, yte, hierarchy_csv, label_set, _ = get_imagenet_data()
 
 elif args.dataset == "mim":
-    Xtr, Xte, ytr, yte, hierarchy_csv, label_set = get_mim_data()
+    Xtr, Xte, ytr, yte, hierarchy_csv, label_set, _ = get_mim_data()
 
 son2parent = get_son2parent(hierarchy_csv)
 

@@ -71,7 +71,7 @@ def get_mim_data():
     
     name2clsid = {v: k for k, v in enumerate(label_set)}
     hierarchy_csv = 'moments_depth_v4.csv'
-    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set
+    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set, name2clsid
 
 def get_cifar_data():
     save_dict = torch.load("feat/cifar100-clip-features.pt")
@@ -96,7 +96,7 @@ def get_cifar_data():
     # sorted list of class names
     hierarchy_csv = 'cifar100_hierarchy.csv'
     label_set = [clsid2name[i] for i in range(len(clsid2name))]
-    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set
+    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set, name2clsid
 
 def get_imagenet_data():
     train_save_dict = torch.load("feat/imagenet_train_clip_features.pt")
@@ -109,4 +109,4 @@ def get_imagenet_data():
     name2clsid = get_id2idx(imnet_json)
     clsid2name = {v: k for k, v in name2clsid.items()}
     label_set = [clsid2name[i] for i in range(len(clsid2name))]
-    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set
+    return Xtr,Xte,ytr,yte,hierarchy_csv,label_set, name2clsid
