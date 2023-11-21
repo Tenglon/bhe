@@ -16,6 +16,21 @@ from pmath import pair_wise_eud, pair_wise_cos, pair_wise_hyp
 from utils import get_son2parent
 from dataset import get_cifar_data, get_imagenet_data, get_mim_data
 
+def Binarize(n_bits, Xte):
+    feat_max, feat_min = torch.max(Xte), torch.min(Xte)
+    minimum_scale = (feat_max - feat_min) / (2 ** n_bits - 1)
+
+    Xte_uint8 = torch.floor((Xte - feat_min) / minimum_scale).to(torch.uint8)
+
+    Xte_8bits = np.unpackbits(Xte_uint8[:, None, :], axis=1)
+
+    Xte_nbits = Xte_8bits[:, 8-n_bits:,:]
+
+    Xte_binary = Xte_nbits.reshape(-1, n_bits*Xte.shape[1])
+
+    Bte = torch.from_numpy(Xte_binary).to(torch.bool)
+    return Bte
+
 
 def loss_fn(y, Apred, dist_func, c, T):
 
