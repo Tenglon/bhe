@@ -14,25 +14,8 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset
 from pmath import pair_wise_eud, pair_wise_cos, pair_wise_hyp
 from utils import get_son2parent
+from bin_utils import binarize, ext_hamming_dist
 from dataset import get_cifar_data, get_imagenet_data, get_mim_data
-
-def binarize(X, n_bits = 2):
-
-    feat_max, feat_min = torch.max(X), torch.min(X)
-
-    minimum_scale = (feat_max - feat_min) / (2 ** n_bits)
-    X_uint8 = torch.floor((X - feat_min) / minimum_scale).to(torch.uint8)
-
-    nBytes = X.shape[1] // 8 * n_bits
-
-    B = torch.zeros(X.shape[0], nBytes, dtype=torch.uint8)
-
-    n_groups = 8 // n_bits # each Byte is divided to n_groups
-
-    for i in range(n_groups):
-        B += X_uint8[:, i*nBytes:(i+1)*nBytes] << i * n_bits
-
-    return B
 
 
 def loss_fn(y, Apred, dist_func, c, T):
@@ -146,6 +129,34 @@ def get_topK_preds(X, y, top_K):
     return top_k_preds
 
 
+def ext_hamming_dist_blockwise(B1, B2, n_bits):
+
+    block_size = 4096
+
+    dist = torch.zeros(B1.shape[0], B2.shape[0]).cuda()
+    B1chunks = torch.split(B1, block_size, dim=0)
+    B2chunks = torch.split(B2, block_size, dim=0)
+    for i, Bchunk1 in enumerate(B1chunks):
+        for j, Bchunk2 in enumerate(B2chunks):
+            dist[i*block_size:(i+1)*block_size, j*block_size:(j+1)*block_size] = ext_hamming_dist(Bchunk1, Bchunk2, args.n_bits)
+
+    return dist
+
+
+def get_topK_preds_bin(X, y, top_K):
+    
+    B, _ = binarize(X, args.n_bits)
+    B = B.cuda()
+
+    dist = ext_hamming_dist_blockwise(B, B, args.n_bits)
+
+    _, indices = torch.sort(dist, descending=False, dim=1)
+
+    top_k_preds = y[indices[:, 1:top_K + 1]]
+
+    return top_k_preds
+
+
 model = MLP(Xtr.shape[1], args.hidden_dim, embs.shape[1])
 model = model.cuda()
 criterion = nn.CrossEntropyLoss()
@@ -209,7 +220,7 @@ for epoch in range(args.epochs):
             Apred = torch.cat(Apred_list, axis = 0)
 
         st = time()
-        ypred_topk = get_topK_preds(Apred, yte, top_K)
+        ypred_topk = get_topK_preds_bin(Apred, yte, top_K)
         mAP = metric.hop_mAP(ypred_topk, yte, hop = 0)
         SmAP = metric.hop_mAP(ypred_topk, yte, hop = 2)
         acc = (ypred_topk[:,0] == yte).float().mean().item()
