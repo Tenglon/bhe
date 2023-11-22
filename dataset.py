@@ -59,8 +59,8 @@ def get_id2idx(imnet_json):
 
 
 def get_mim_data():
-    data_train = torch.load('feat/moments_train.pth')
-    data_val = torch.load('feat/moments_val.pth')
+    data_train = torch.load('feat/mim_3dswin_train_feat.pth')
+    data_val = torch.load('feat/mim_3dswin_valid_feat.pth')
 
     label_set = list(set(data_train['label']))
     label_set.sort() # 有Sort很重要
