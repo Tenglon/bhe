@@ -99,7 +99,7 @@ embs_cuda = embs.cuda()
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.99, random_state=42)
 yte = torch.from_numpy(yte)
 
-Xte_small, yte_small = Xte[:30000], yte[:30000]
+Xte_small, yte_small = Xte[:50000], yte[:50000]
 
 train_dataset = FeatureDataset(Xtr, ytr)
 test_dataset = FeatureDataset(Xte_small, yte_small)
@@ -117,6 +117,7 @@ top_K = 10
 
 
 re_calculate_count = 0
+best_mAP = 0
 
 for epoch in range(args.epochs):
 
@@ -181,3 +182,10 @@ for epoch in range(args.epochs):
         eval_time = time() - st
 
         print(f'Acc: {acc:.4f}, epoch_time: {epoch_time:.4f}, eval_time: {eval_time:.4f}, mAP: {mAP:.4f}, SmAP: {SmAP:.4f}')
+
+        if mAP > best_mAP:
+            best_mAP = mAP
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), f'./checkpoints/quick_euc_{args.n_bits}bits_{args.embed_dim}dim.pth')
+            print(f'Best mAP: {best_mAP:.4f}, model saved!')
+
