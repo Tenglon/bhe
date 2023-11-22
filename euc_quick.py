@@ -180,4 +180,4 @@ for epoch in range(args.epochs):
         acc = (ypred_topk[:,0] == yte_small).float().mean().item()
         eval_time = time() - st
 
-        print(f'Acc: {acc:.4f}, mAP: {mAP:.4f}, SmAP: {SmAP:.4f}')
+        print(f'Acc: {acc:.4f}, epoch_time: {epoch_time:.4f}, eval_time: {eval_time:.4f}, mAP: {mAP:.4f}, SmAP: {SmAP:.4f}')
