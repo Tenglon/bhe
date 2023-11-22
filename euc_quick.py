@@ -80,9 +80,6 @@ def get_topK_preds(X, y, top_K):
 
     _, indices = torch.sort(sim_score, descending=False, dim=1)
 
-    import pdb
-    pdb.set_trace()
-
     top_k_preds = y[indices[:, 1:top_K + 1]]
 
     return top_k_preds
@@ -94,12 +91,13 @@ label_set = list(set(y))
 label_set.sort()
 y = np.array([label_set.index(label) for label in y])
 
-son2parent = {label: 'Root' for label in label_set}
+son2parent = OrderedDict({label: 'Root' for label in label_set})
 
 embs = torch.rand((345, args.emb_dim))
 embs_cuda = embs.cuda()
 
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.99, random_state=42)
+yte = torch.from_numpy(yte)
 
 Xte_small, yte_small = Xte[:30000], yte[:30000]
 
@@ -176,10 +174,10 @@ for epoch in range(args.epochs):
             Apred = torch.cat(Apred_list, axis = 0)
 
         st = time()
-        ypred_topk = get_topK_preds(Apred, yte, top_K)
-        mAP = metric.hop_mAP(ypred_topk, yte, hop = 0)
-        SmAP = metric.hop_mAP(ypred_topk, yte, hop = 2)
-        acc = (ypred_topk[:,0] == yte).float().mean().item()
+        ypred_topk = get_topK_preds(Apred, yte_small, top_K)
+        mAP = metric.hop_mAP(ypred_topk, yte_small, hop = 0)
+        SmAP = metric.hop_mAP(ypred_topk, yte_small, hop = 2)
+        acc = (ypred_topk[:,0] == yte_small).float().mean().item()
         eval_time = time() - st
 
         print(f'Acc: {acc:.4f}, mAP: {mAP:.4f}, SmAP: {SmAP:.4f}')

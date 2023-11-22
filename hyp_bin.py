@@ -8,13 +8,13 @@ import torch.nn.functional as F
 import torch.utils.tensorboard as tb
 import json
 from time import time
+from bin_utils import binarize, ext_hamming_dist
 from metric import Metric
 
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset
 from pmath import pair_wise_eud, pair_wise_cos, pair_wise_hyp
 from utils import get_son2parent
-from bin_utils import binarize, ext_hamming_dist
 from dataset import get_cifar_data, get_imagenet_data, get_mim_data
 
 
@@ -71,19 +71,16 @@ elif args.dataset == "mim":
     Xtr, Xte, ytr, yte, hierarchy_csv, label_set, name2clsid = get_mim_data()
 
 
-# embs = torch.rand((len(label_set), 128))
-son2parent = get_son2parent(hierarchy_csv)
-# emb_data = torch.load(args.emb_path)
-# embs_preorder = emb_data['embeddings']
-# names_preorder = emb_data['objects']
-
 embs = torch.rand((len(label_set), args.emb_dim))
-embs_cuda = embs.cuda()
+son2parent = get_son2parent(hierarchy_csv)
+emb_data = torch.load(args.emb_path)
+embs_preorder = emb_data['embeddings']
+names_preorder = emb_data['objects']
 
-# for i, name in enumerate(names_preorder):
-#     if name in name2clsid:
-#         embs[name2clsid[name], :] = embs_preorder[i]
-# embs_cuda = copy.deepcopy(embs).cuda()
+for i, name in enumerate(names_preorder):
+    if name in name2clsid:
+        embs[name2clsid[name], :] = embs_preorder[i]
+embs_cuda = copy.deepcopy(embs).cuda()
 
 if torch.sum(embs == 0) > 0:
     raise ValueError("Some classes are missing in the embedding file.")
@@ -112,22 +109,11 @@ class MLP(nn.Module):
         x=  self.relu(self.fc2(x))
         # x = self.bn2(x)
         x = self.fc3(x)
-        # if (x.norm(dim=1) >= r).any():
-            # x = r * x / (x.norm(dim=1,keepdim=True) + 1e-2)
+        if (x.norm(dim=1) >= r).any():
+            x = r * x / (x.norm(dim=1,keepdim=True) + 1e-2)
 
         return x
-
     
-def get_topK_preds(X, y, top_K):
-
-    sim_score = pair_wise_cos(X, X)
-
-    _, indices = torch.sort(sim_score, descending=False, dim=1)
-
-    top_k_preds = y[indices[:, 1:top_K + 1]]
-
-    return top_k_preds
-
 
 def ext_hamming_dist_blockwise(B1, B2, n_bits):
 
@@ -166,7 +152,7 @@ metric = Metric(label_set, son2parent)
 
 re_calculate_count = 0
 
-print(f"dataset: {args.dataset}, n_bits: {args.n_bits}, emb_dim: {args.emb_dim}")
+print(f"dataset: {args.dataset}, n_bits: {args.n_bits}, emb_path: {args.emb_path}")
 
 for epoch in range(args.epochs):
 
@@ -182,10 +168,10 @@ for epoch in range(args.epochs):
         Apred = model(X)
 
 
-        loss = loss_fn(y, Apred, pair_wise_eud, c = args.c, T = 1)
+        loss = loss_fn(y, Apred, pair_wise_hyp, c = args.c, T = 1)
 
         while loss.isnan().any():
-            loss = loss_fn(y, Apred, pair_wise_eud, c = args.c, T = 1)
+            loss = loss_fn(y, Apred, pair_wise_hyp, c = args.c, T = 1)
             re_calculate_count += 1
 
             if re_calculate_count % 100 == 0:
@@ -212,10 +198,10 @@ for epoch in range(args.epochs):
                 Apred = model(X)
                 Apred_list.append(Apred.detach().cpu())
 
-                loss = loss_fn(y, Apred, pair_wise_eud, c = args.c, T = 1)
+                loss = loss_fn(y, Apred, pair_wise_hyp, c = args.c, T = 1)
 
                 while loss.isnan().any():
-                    loss = loss_fn(y, Apred, pair_wise_eud, c = args.c, T = 1)
+                    loss = loss_fn(y, Apred, pair_wise_hyp, c = args.c, T = 1)
                     re_calculate_count += 1
                     
                 te_losses.append(loss.detach().cpu().item())
