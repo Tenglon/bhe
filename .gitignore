@@ -2,3 +2,4 @@
 /embs
 *.csv
 /runs
+/logs

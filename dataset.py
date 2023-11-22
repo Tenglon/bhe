@@ -64,6 +64,9 @@ def get_mim_data():
 
     label_set = list(set(data_train['label']))
     label_set.sort() # 有Sort很重要
+
+    import pdb
+    pdb.set_trace()
     
     Xtr, Xte = data_train['feat'], data_val['feat']
     ytr = torch.tensor([label_set.index(item )for item in data_train['label']])
