@@ -118,6 +118,7 @@ top_K = 10
 
 re_calculate_count = 0
 best_mAP = 0
+print(f"n_bits: {args.n_bits}, emb_dim: {args.emb_dim}")
 
 for epoch in range(args.epochs):
 
@@ -150,7 +151,6 @@ for epoch in range(args.epochs):
     epoch_time = time() - st
 
     # Get new feature
-    best_mAP = 0
     if epoch % 10 == 0:
         with torch.no_grad():
 

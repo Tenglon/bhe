@@ -26,6 +26,7 @@ parser.add_argument('--c', type=float, default=0.1, help='curvature for image em
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
 parser.add_argument('--workers', type=int, default=0, help='number of workers for dataloader')
 args = parser.parse_args()
+r = np.sqrt(1/args.c)
 
 def loss_fn(y, Apred, dist_func, c, T):
 
@@ -96,6 +97,9 @@ def get_topK_preds_bin(X, y, top_K):
 
     dist = ext_hamming_dist_blockwise(B, B, args.n_bits)
 
+    if dist.shape[0] > 30000:
+        dist = dist.cpu()
+
     _, indices = torch.sort(dist, descending=False, dim=1)
     indices = indices.cpu()
 
@@ -151,7 +155,7 @@ top_K = 10
 re_calculate_count = 0
 best_mAP = 0
 
-print(f"n_bits: {args.n_bits}, emb_path: {args.emb_path}")
+print(f"n_bits: {args.n_bits}, emb_dim: {args.emb_dim}")
 
 for epoch in range(args.epochs):
 
@@ -162,7 +166,7 @@ for epoch in range(args.epochs):
     
     for i, (X, y, A) in enumerate(train_dataloader):
 
-        X, y, A = X.cuda(), y.cuda(), A.cuda()
+        X, y, A = X.float().cuda(), y.cuda(), A.cuda()
 
         Apred = model(X)
 
@@ -191,7 +195,7 @@ for epoch in range(args.epochs):
 
             for i, (X, y, A) in enumerate(test_dataloader):
 
-                X, y, A = X.cuda(), y.cuda(), A.cuda()
+                X, y, A = X.float().cuda(), y.cuda(), A.cuda()
 
                 Apred = model(X)
                 Apred_list.append(Apred.detach().cpu())

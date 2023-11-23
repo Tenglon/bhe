@@ -136,6 +136,9 @@ def get_topK_preds_bin(X, y, top_K):
 
     dist = ext_hamming_dist_blockwise(B, B, args.n_bits)
 
+    if dist.shape[0] > 30000:
+        dist = dist.cpu()
+
     _, indices = torch.sort(dist, descending=False, dim=1)
     indices = indices.cpu()
 
