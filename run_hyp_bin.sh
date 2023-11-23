@@ -27,3 +27,18 @@ CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 16 --emb_path embs
 CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 32 --emb_path embs/iclr24_imagenet_32d.pth --dataset imagenet >> logs/hyp_bin_imagenet.log
 CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 64 --emb_path embs/iclr24_imagenet_64d.pth --dataset imagenet >> logs/hyp_bin_imagenet.log
 CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 128 --emb_path embs/iclr24_imagenet_128d.pth --dataset imagenet >> logs/hyp_bin_imagenet.log
+
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 4 --emb_path embs/iclr24_moments_4d.pth --dataset mim > logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 8 --emb_path embs/iclr24_moments_8d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 16 --emb_path embs/iclr24_moments_16d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 32 --emb_path embs/iclr24_moments_32d.pth --dataset mim > logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 64 --emb_path embs/iclr24_moments_64d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 128 --emb_path embs/iclr24_moments_128d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 2 --emb_dim 256 --emb_path embs/iclr24_moments_256d.pth --dataset mim >> logs/hyp_bin_mim.log
+
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 4 --emb_path embs/iclr24_moments_4d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 8 --emb_path embs/iclr24_moments_8d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 16 --emb_path embs/iclr24_moments_16d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 32 --emb_path embs/iclr24_moments_32d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 64 --emb_path embs/iclr24_moments_64d.pth --dataset mim >> logs/hyp_bin_mim.log
+# CUDA_VISIBLE_DEVICES=1 python hyp_bin.py --n_bits 4 --emb_dim 128 --emb_path embs/iclr24_moments_128d.pth --dataset mim >> logs/hyp_bin_mim.log

@@ -61,6 +61,10 @@ args = parser.parse_args()
 r = np.sqrt(1/args.c)
 writer = tb.SummaryWriter(log_dir=f'runs/{args.dataset}'.format(args.dataset))
 
+if args.dataset == "mim":
+    top_K = 50
+    print("top_K set to :", top_K)
+
 if args.dataset == "cifar100":
     Xtr, Xte, ytr, yte, hierarchy_csv, label_set, name2clsid = get_cifar_data()
     
