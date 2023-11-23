@@ -186,6 +186,6 @@ for epoch in range(args.epochs):
         if mAP > best_mAP:
             best_mAP = mAP
             best_model = copy.deepcopy(model)
-            torch.save(best_model.state_dict(), f'./checkpoints/quick_euc_{args.n_bits}bits_{args.embed_dim}dim.pth')
+            torch.save(best_model.state_dict(), f'./checkpoints/quick_euc_{args.n_bits}bits_{args.emb_dim}dim.pth')
             print(f'Best mAP: {best_mAP:.4f}, model saved!')
 
