@@ -81,7 +81,7 @@ def ext_hamming_dist(B1, B2, n_bits = 2):
 
 n_bits = 8
 
-X1 = torch.rand(2, 8).cuda()
+X1 = torch.rand(10, 512).cuda()
 X1 = X1 - X1.min() + 1e-8
 # X1 = [[1, 0, 0, 0, 0, 0, 0, 0],
 #         [1, 1, 0, 0, 0, 0, 0, 0],
@@ -90,7 +90,7 @@ X1 = X1 - X1.min() + 1e-8
 X1 = torch.tensor(X1, dtype=torch.float).cuda()
 B1, X1_uint8 = binarize(X1, n_bits)
 
-X2 = torch.rand(5, 8).cuda()
+X2 = torch.rand(1000, 512).cuda()
 X2 = X2 - X2.min() + 1e-8
 # X2 = [[0, 1, 0, 0, 0, 0, 0, 0],
 #       [1, 1, 0, 0, 0, 0, 0, 0],
@@ -105,15 +105,13 @@ dist = ext_hamming_dist(B1, B2, n_bits)
 tmp = dist[0,0].item() # call to make sure the computation is done
 t1 = time.time()
 print(f"hamming_dist time: {t1 - t0}")
-euc_dist_sq = (X1[:,None,:]- (X2[None,:,:])).pow(2).sum(dim=-1)
+# euc_dist_sq = (X1[:,None,:]- (X2[None,:,:])).pow(2).sum(dim=-1)
 euc_dist_sq = torch.cdist(X1, X2, p=2, compute_mode='use_mm_for_euclid_dist') ** 2
 
-euc_dist_uint8_sq = (X1_uint8[:,None,:] - X2_uint8[None,:,:]).pow(2).sum(dim=-1)
-ratio = euc_dist_uint8_sq / euc_dist_sq
+# euc_dist_uint8_sq = (X1_uint8[:,None,:] - X2_uint8[None,:,:]).pow(2).sum(dim=-1)
+# ratio = euc_dist_uint8_sq / euc_dist_sq
 # inner_product = X1@X2.T
+
 tmp = euc_dist_sq[0,0].item() # call to make sure the computation is done
 t2 = time.time()
 print(f"euc_dist_sq time: {t2 - t1}")
-
-import pdb
-pdb.set_trace()

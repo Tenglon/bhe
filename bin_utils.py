@@ -61,7 +61,9 @@ def ext_hamming_dist(B1, B2, n_bits = 2):
 
     assert B1.shape[1] == B2.shape[1]
 
-    dist = torch.zeros(B1.shape[0], B2.shape[0], dtype=torch.int64).cuda()
+    dist = torch.zeros(B1.shape[0], B2.shape[0], dtype=torch.int64)
+    if B1.is_cuda:
+        dist = dist.cuda()
 
     for i in range(n_bits):
 
